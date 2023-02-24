@@ -18,7 +18,7 @@
     "js"
   ],
   "author": "Axel Rothe",
-  "homepage": "https://github.com/AxelRothe/alephalphajs#readme",
+  "homepage": "https://github.com/AxelRothe/alephalpha#readme",
   "license": "GPL-3.0",
   "devDependencies": {
     "@types/node": "^18.11.18",

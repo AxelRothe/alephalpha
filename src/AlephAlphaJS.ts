@@ -68,6 +68,20 @@ export default class AlephAlphaJS {
     maximum_tokens?: number;
     stop_sequences?: string[];
   }) {
+    //if the prompt is a string then check if it has trailing whitespaces and remove them
+    if (typeof options.prompt === "string") {
+      options.prompt = options.prompt.trim();
+    }
+    //if the prompt is an array of multimodal options then check if each option has trailing whitespaces and remove them
+    else if (Array.isArray(options.prompt)) {
+      options.prompt.forEach((option) => {
+        //check if string
+        if (option.type === "string") {
+          option.data = option.data.trim();
+        }
+      });
+    }
+
     try {
       return await this.post("/complete", {
         model: options.model,
