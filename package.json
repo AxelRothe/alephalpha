@@ -1,0 +1,34 @@
+{
+  "name": "alephalphajs",
+  "version": "1.0.0",
+  "description": "javascript implementation of Aleph Alpha API",
+  "main": "/build/index.js",
+  "types": "/build/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "ncc build ./src/index.ts -e [mod]",
+    "test": "npm run build && mocha test/index.js",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "alephalpha",
+    "nodejs",
+    "javascript",
+    "js"
+  ],
+  "author": "Axel Rothe",
+  "homepage": "https://github.com/AxelRothe/alephalphajs#readme",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "@vercel/ncc": "^0.36.1",
+    "dotenv": "^16.0.3",
+    "mocha": "^10.2.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "axios": "^1.3.4",
+    "expect.js": "^0.3.1"
+  }
+}
