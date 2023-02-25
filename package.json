@@ -1,6 +1,6 @@
 {
   "name": "alephalphajs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "javascript implementation of Aleph Alpha API",
   "main": "/dist/index.js",
   "types": "/dist/index.d.ts",
