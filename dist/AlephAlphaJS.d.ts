@@ -20,7 +20,10 @@ export default class AlephAlphaJS {
         temperature?: number;
         maximum_tokens?: number;
         stop_sequences?: string[];
-    }): Promise<any>;
+    }): Promise<{
+        completion: any;
+        usage: any;
+    }>;
     async: any;
     private post;
     private delete;

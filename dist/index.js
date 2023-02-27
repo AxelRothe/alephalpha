@@ -8166,13 +8166,20 @@ class AlephAlphaJS {
             });
         }
         try {
-            return await this.post("/complete", {
+            const completion = await this.post("/complete", {
                 model: options.model,
                 prompt: options.prompt,
                 temperature: options.temperature,
                 maximum_tokens: options.maximum_tokens,
                 stop_sequences: options.stop_sequences,
             });
+            const usages = await this.get("/users/me/requests");
+            console.log(usages);
+            const usage = usages[0];
+            return {
+                completion: completion.completions[0].completion,
+                usage,
+            };
         }
         catch (error) {
             console.log(error);
