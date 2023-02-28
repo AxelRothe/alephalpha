@@ -3600,7 +3600,7 @@ var __webpack_exports__ = {};
 
 // EXPORTS
 __nccwpck_require__.d(__webpack_exports__, {
-  "v": () => (/* reexport */ AlephAlphaJS)
+  "v": () => (/* reexport */ AlephAlphaJS_AlephAlphaJS)
 });
 
 ;// CONCATENATED MODULE: ./node_modules/axios/lib/helpers/bind.js
@@ -8094,8 +8094,20 @@ axios.default = axios;
 
 ;// CONCATENATED MODULE: ./src/AlephAlphaJS.ts
 
-class AlephAlphaJS {
+
+class AlephAlphaJS_AlephAlphaJS {
     static url = "https://api.aleph-alpha.com";
+    static COST_PER_N_TOKENS = 1000;
+    static MODEL_INPUT_TOKEN_COST = {
+        "luminous-base": 0.006 / AlephAlphaJS_AlephAlphaJS.COST_PER_N_TOKENS,
+        "luminous-extended": 0.009 / AlephAlphaJS_AlephAlphaJS.COST_PER_N_TOKENS,
+        "luminous-supreme": 0.035 / AlephAlphaJS_AlephAlphaJS.COST_PER_N_TOKENS,
+        "luminous-supreme-control": 0.04375 / AlephAlphaJS_AlephAlphaJS.COST_PER_N_TOKENS,
+    };
+    static MODEL_INPUT_IMAGE_COST = {
+        "luminous-base": 0.006048,
+        "luminous-extended": 0.009072,
+    };
     API_TOKEN;
     header;
     constructor(options) {
@@ -8152,33 +8164,69 @@ class AlephAlphaJS {
         }
     }
     async completion(options) {
+        //check whether the model is multimodal
+        const costPerImage = AlephAlphaJS_AlephAlphaJS.MODEL_INPUT_IMAGE_COST[options.model];
+        if (!costPerImage)
+            throw new Error("Invalid model selected for usage with images");
+        let cost = {
+            prompt: 0,
+            completion: 0,
+            images: 0,
+        };
         //if the prompt is a string then check if it has trailing whitespaces and remove them
         if (typeof options.prompt === "string") {
             options.prompt = options.prompt.trim();
+            const prompt_tokens = await this.post("/tokenize", {
+                model: options.model,
+                prompt: options.prompt,
+                tokens: true,
+                token_ids: true,
+            });
+            cost.prompt += prompt_tokens.tokens.length;
         }
         //if the prompt is an array of multimodal options then check if each option has trailing whitespaces and remove them
         else if (Array.isArray(options.prompt)) {
-            options.prompt.forEach((option) => {
+            for (const option of options.prompt) {
                 //check if string
-                if (option.type === "string") {
+                if (option.type === "text") {
                     option.data = option.data.trim();
+                    const prompt_tokens = await this.post("/tokenize", {
+                        model: options.model,
+                        prompt: option.data,
+                        tokens: true,
+                        token_ids: true,
+                    });
+                    console.log(prompt_tokens);
+                    cost.prompt += prompt_tokens.tokens.length;
                 }
-            });
+                else if (option.type === "image") {
+                    cost.images += 1;
+                }
+            }
         }
         try {
+            //run completion
             const completion = await this.post("/complete", {
                 model: options.model,
                 prompt: options.prompt,
                 temperature: options.temperature,
                 maximum_tokens: options.maximum_tokens,
                 stop_sequences: options.stop_sequences,
+                tokens: true,
             });
-            const usages = await this.get("/users/me/requests");
-            console.log(usages);
-            const usage = usages[0];
+            cost.completion = completion.completions[0].completion_tokens.length;
+            const costs = (cost.prompt + cost.completion) *
+                AlephAlphaJS_AlephAlphaJS.MODEL_INPUT_TOKEN_COST[options.model] +
+                cost.images * costPerImage;
+            //return both the completion and the cost
             return {
                 completion: completion.completions[0].completion,
-                usage,
+                usage: {
+                    prompt_tokens: cost.prompt,
+                    completion_tokens: cost.completion,
+                    images_count: cost.images,
+                    cost: costs,
+                },
             };
         }
         catch (error) {
@@ -8192,7 +8240,7 @@ class AlephAlphaJS {
     // ========================
     async post(url, data) {
         try {
-            const result = await lib_axios.post(AlephAlphaJS.url + url, data, {
+            const result = await lib_axios.post(AlephAlphaJS_AlephAlphaJS.url + url, data, {
                 headers: {
                     "Content-Type": "application/json",
                     ...this.header,
@@ -8209,7 +8257,7 @@ class AlephAlphaJS {
     }
     async delete(url) {
         try {
-            const result = await lib_axios["delete"](AlephAlphaJS.url + url, {
+            const result = await lib_axios["delete"](AlephAlphaJS_AlephAlphaJS.url + url, {
                 headers: {
                     ...this.header,
                 },
@@ -8225,7 +8273,7 @@ class AlephAlphaJS {
     }
     async get(url) {
         try {
-            const result = await lib_axios.get(AlephAlphaJS.url + url, {
+            const result = await lib_axios.get(AlephAlphaJS_AlephAlphaJS.url + url, {
                 headers: this.header,
             });
             if (result.status === 200)
