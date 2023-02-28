@@ -8196,7 +8196,6 @@ class AlephAlphaJS_AlephAlphaJS {
                         tokens: true,
                         token_ids: true,
                     });
-                    console.log(prompt_tokens);
                     cost.prompt += prompt_tokens.tokens.length;
                 }
                 else if (option.type === "image") {

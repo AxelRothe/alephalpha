@@ -82,9 +82,6 @@ export default class AlephAlphaJS {
     stop_sequences?: string[];
   }) {
     //check whether the model is multimodal
-    const costPerImage = AlephAlphaJS.MODEL_INPUT_IMAGE_COST[options.model];
-    if (!costPerImage)
-      throw new Error("Invalid model selected for usage with images");
 
     let cost = {
       prompt: 0,
@@ -136,10 +133,16 @@ export default class AlephAlphaJS {
 
       cost.completion = completion.completions[0].completion_tokens.length;
 
-      const costs =
+      let costs =
         (cost.prompt + cost.completion) *
-          AlephAlphaJS.MODEL_INPUT_TOKEN_COST[options.model] +
-        cost.images * costPerImage;
+        AlephAlphaJS.MODEL_INPUT_TOKEN_COST[options.model];
+
+      if (cost.images > 0) {
+        const costPerImage = AlephAlphaJS.MODEL_INPUT_IMAGE_COST[options.model];
+        if (!costPerImage)
+          throw new Error("Invalid model selected for usage with images");
+        costs += cost.images * costPerImage;
+      }
 
       //return both the completion and the cost
       return {
