@@ -113,7 +113,7 @@ export default class AlephAlphaJS {
             tokens: true,
             token_ids: true,
           });
-          cost.prompt += prompt_tokens.tokens.length;
+          cost.prompt += prompt_tokens.tokens.length * 1.5;
         } else if (option.type === "image") {
           cost.images += 1;
         }
@@ -160,7 +160,91 @@ export default class AlephAlphaJS {
     }
   }
 
-  async;
+  async evaluate(options: {
+    model: string;
+    prompt: string | AAMultiModalOption[];
+    completion_expected: string;
+  }) {
+    let cost = {
+      prompt: 0,
+      completion: 0,
+      images: 0,
+    };
+
+    //if the prompt is a string then check if it has trailing whitespaces and remove them
+    if (typeof options.prompt === "string") {
+      options.prompt = options.prompt.trim();
+
+      const prompt_tokens = await this.post("/tokenize", {
+        model: options.model,
+        prompt: options.prompt,
+        tokens: true,
+        token_ids: true,
+      });
+      cost.prompt += prompt_tokens.tokens.length;
+    }
+    //if the prompt is an array of multimodal options then check if each option has trailing whitespaces and remove them
+    else if (Array.isArray(options.prompt)) {
+      for (const option of options.prompt) {
+        //check if string
+        if (option.type === "text") {
+          option.data = option.data.trim();
+          const prompt_tokens = await this.post("/tokenize", {
+            model: options.model,
+            prompt: option.data,
+            tokens: true,
+            token_ids: true,
+          });
+          cost.prompt += prompt_tokens.tokens.length * 1.6;
+        } else if (option.type === "image") {
+          cost.images += 1;
+        }
+      }
+    }
+
+    try {
+      //run evaluation
+      const evaluation = await this.post("/evaluate", {
+        model: options.model,
+        prompt: options.prompt,
+        completion_expected: options.completion_expected,
+      });
+
+      cost.completion = evaluation.result.tokens;
+
+      let costs =
+        (cost.prompt + cost.completion) *
+        AlephAlphaJS.MODEL_INPUT_TOKEN_COST[options.model];
+
+      if (cost.images > 0) {
+        const costPerImage = AlephAlphaJS.MODEL_INPUT_IMAGE_COST[options.model];
+        if (!costPerImage)
+          throw new Error("Invalid model selected for usage with images");
+        costs += cost.images * costPerImage;
+      }
+
+      //return both the completion and the cost
+      return {
+        evaluation: {
+          log_probability: evaluation.result.log_probability,
+          log_perplexity: evaluation.result.log_perplexity,
+          log_perplexity_per_token: evaluation.result.log_perplexity_per_token,
+          log_perplexity_per_character:
+            evaluation.result.log_perplexity_per_character,
+          correct_greedy: evaluation.result.correct_greedy,
+        },
+        usage: {
+          prompt_tokens: cost.prompt,
+          completion_tokens: cost.completion,
+          images_count: cost.images,
+          cost: costs,
+        },
+      };
+    } catch (error: any) {
+      console.log(error);
+      throw error;
+    }
+  }
 
   // ========================
   //  UTILITIES

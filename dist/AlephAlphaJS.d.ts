@@ -40,7 +40,25 @@ export default class AlephAlphaJS {
             cost: number;
         };
     }>;
-    async: any;
+    evaluate(options: {
+        model: string;
+        prompt: string | AAMultiModalOption[];
+        completion_expected: string;
+    }): Promise<{
+        evaluation: {
+            log_probability: any;
+            log_perplexity: any;
+            log_perplexity_per_token: any;
+            log_perplexity_per_character: any;
+            correct_greedy: any;
+        };
+        usage: {
+            prompt_tokens: number;
+            completion_tokens: number;
+            images_count: number;
+            cost: number;
+        };
+    }>;
     private post;
     private delete;
     private get;
