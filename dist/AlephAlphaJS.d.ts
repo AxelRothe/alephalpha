@@ -59,6 +59,22 @@ export default class AlephAlphaJS {
             cost: number;
         };
     }>;
+    semanticEmbed(options: {
+        prompt: string | AAMultiModalOption[];
+        model?: string;
+        representation?: string;
+        compress_to_size?: number;
+    }): Promise<{
+        embed: any;
+    }>;
+    batchedSemanticEmbed(options: {
+        prompts: string[];
+        model?: string;
+        representation?: string;
+        compress_to_size?: number;
+    }): Promise<{
+        embeddings: any;
+    }>;
     private post;
     private delete;
     private get;

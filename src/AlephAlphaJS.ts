@@ -134,8 +134,8 @@ export default class AlephAlphaJS {
       cost.completion = completion.completions[0].completion_tokens.length;
 
       let costs =
-        (cost.prompt + cost.completion) *
-        AlephAlphaJS.MODEL_INPUT_TOKEN_COST[options.model];
+          (cost.prompt + cost.completion) *
+          AlephAlphaJS.MODEL_INPUT_TOKEN_COST[options.model];
 
       if (cost.images > 0) {
         const costPerImage = AlephAlphaJS.MODEL_INPUT_IMAGE_COST[options.model];
@@ -213,8 +213,8 @@ export default class AlephAlphaJS {
       cost.completion = evaluation.result.tokens;
 
       let costs =
-        (cost.prompt + cost.completion) *
-        AlephAlphaJS.MODEL_INPUT_TOKEN_COST[options.model];
+          (cost.prompt + cost.completion) *
+          AlephAlphaJS.MODEL_INPUT_TOKEN_COST[options.model];
 
       if (cost.images > 0) {
         const costPerImage = AlephAlphaJS.MODEL_INPUT_IMAGE_COST[options.model];
@@ -230,7 +230,7 @@ export default class AlephAlphaJS {
           log_perplexity: evaluation.result.log_perplexity,
           log_perplexity_per_token: evaluation.result.log_perplexity_per_token,
           log_perplexity_per_character:
-            evaluation.result.log_perplexity_per_character,
+          evaluation.result.log_perplexity_per_character,
           correct_greedy: evaluation.result.correct_greedy,
         },
         usage: {
@@ -243,6 +243,56 @@ export default class AlephAlphaJS {
     } catch (error: any) {
       console.log(error);
       throw error;
+    }
+  }
+
+  async semanticEmbed(options: {
+    prompt: string | AAMultiModalOption[];
+    model?: string;
+    representation?: string;
+    compress_to_size?: number;
+  }) {
+
+    try {
+      const embed = await this.post("/semantic_embed", {
+        model: options.model ?? "luminous-base",
+        prompt: options.prompt,
+        representation: options.representation ?? "document",
+        compress_to_size: options.compress_to_size ?? 128,
+      });
+
+      return {
+        embed: embed.embedding,
+      };
+    } catch (error: any) {
+        console.log(error);
+        throw error;
+    }
+  }
+
+  async batchedSemanticEmbed(options: {
+    prompts: string[];
+    model?: string;
+    representation?: string;
+    compress_to_size?: number;
+  }) {
+
+    try {
+      const embed = await this.post("/batch_semantic_embed", {
+        model: options.model ?? "luminous-base",
+        prompts: options.prompts,
+        representation: options.representation ?? "document",
+        compress_to_size: options.compress_to_size ?? 128,
+      });
+
+      console.log(embed.embeddings);
+
+      return {
+        embeddings: embed.embeddings,
+      };
+    } catch (error: any) {
+        console.log(error);
+        throw error;
     }
   }
 
