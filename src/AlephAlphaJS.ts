@@ -285,8 +285,6 @@ export default class AlephAlphaJS {
         compress_to_size: options.compress_to_size ?? 128,
       });
 
-      console.log(embed.embeddings);
-
       return {
         embeddings: embed.embeddings,
       };

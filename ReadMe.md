@@ -11,7 +11,7 @@ npm install alephalphajs
 ## Initialization
 
 ```javascript
-import AlephAlpha from 'alephalphajs'
+import { AlephAlpha } from 'alephalphajs'
 
 const aleph = new AlephAlpha({
 	API_TOKEN: 'your-api-key'
