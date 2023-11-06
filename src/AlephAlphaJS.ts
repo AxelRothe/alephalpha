@@ -262,7 +262,7 @@ export default class AlephAlphaJS {
       });
 
       return {
-        embed: embed.embedding,
+        vectors: embed.embedding,
       };
     } catch (error: any) {
         console.log(error);
@@ -286,7 +286,7 @@ export default class AlephAlphaJS {
       });
 
       return {
-        embeddings: embed.embeddings,
+        vectors: embed.embeddings,
       };
     } catch (error: any) {
         console.log(error);

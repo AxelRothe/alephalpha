@@ -8318,7 +8318,7 @@ class AlephAlphaJS_AlephAlphaJS {
                 compress_to_size: options.compress_to_size ?? 128,
             });
             return {
-                embed: embed.embedding,
+                vectors: embed.embedding,
             };
         }
         catch (error) {
@@ -8334,9 +8334,8 @@ class AlephAlphaJS_AlephAlphaJS {
                 representation: options.representation ?? "document",
                 compress_to_size: options.compress_to_size ?? 128,
             });
-            console.log(embed.embeddings);
             return {
-                embeddings: embed.embeddings,
+                vectors: embed.embeddings,
             };
         }
         catch (error) {

@@ -65,7 +65,7 @@ export default class AlephAlphaJS {
         representation?: string;
         compress_to_size?: number;
     }): Promise<{
-        embed: any;
+        vectors: any;
     }>;
     batchedSemanticEmbed(options: {
         prompts: string[];
@@ -73,7 +73,7 @@ export default class AlephAlphaJS {
         representation?: string;
         compress_to_size?: number;
     }): Promise<{
-        embeddings: any;
+        vectors: any;
     }>;
     private post;
     private delete;
